@@ -1,7 +1,6 @@
 import fs from "node:fs";
 
 const content = fs.readFileSync("values.txt", { encoding: "utf8" });
-
 const lines = content.split("\n");
 
 let sum = 0;

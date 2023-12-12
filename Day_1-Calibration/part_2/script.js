@@ -1,32 +1,63 @@
 import fs from "node:fs";
 
-const content = fs.readFileSync("values.txt", { encoding: "utf8" });
+const digitWords = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+];
 
-const lines = content.split("\n");
+const getTwoDigitNumber = (inputString) => {
+  let leftDigit, rightDigit;
+  let i = 0;
+  let len = inputString.length;
 
-let sum = 0;
-
-lines.forEach((line) => {
-  let numbersInLine = [];
-
-  for (const char of line) {
-    if (!isNaN(char)) {
-      numbersInLine.push(char.toString());
+  do {
+    if (!Number(leftDigit)) {
+      if (Number(inputString[i])) {
+        leftDigit = Number(inputString[i]);
+      } else {
+        for (const digit of digitWords) {
+          if (inputString.substring(i).startsWith(digit)) {
+            leftDigit = digitWords.indexOf(digit);
+          }
+        }
+      }
     }
+
+    if (!Number(rightDigit)) {
+      if (Number(inputString[len - i])) {
+        rightDigit = Number(inputString[len - i]);
+      } else {
+        for (const digit of digitWords) {
+          if (inputString.substring(len - i).startsWith(digit)) {
+            rightDigit = digitWords.indexOf(digit);
+          }
+        }
+      }
+    }
+  } while (i++ < len);
+
+  return (leftDigit || 0) * 10 + (rightDigit || 0);
+};
+
+fs.readFile("values.txt", "utf-8", (err, data) => {
+  if (err) {
+    console.error("Error reading the file:", err);
+    return;
   }
 
-  const cleanedNumbersInLine = numbersInLine.filter(
-    (value) => !isNaN(parseInt(value))
-  );
+  const inputLines = data.split("\n").filter((line) => line.trim() !== "");
 
-  if (cleanedNumbersInLine.length === 1) {
-    sum += parseInt(cleanedNumbersInLine[0] + cleanedNumbersInLine[0]);
-  } else if (cleanedNumbersInLine.length > 1) {
-    sum += parseInt(
-      cleanedNumbersInLine[0] +
-        cleanedNumbersInLine[cleanedNumbersInLine.length - 1]
-    );
-  }
+  const sum = inputLines.reduce((acc, line) => {
+    return acc + getTwoDigitNumber(line);
+  }, 0);
+
+  console.log("Sum:", sum);
 });
-
-console.log("Sum:", sum);
